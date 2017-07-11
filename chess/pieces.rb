@@ -41,12 +41,17 @@ class Piece
     "X"
   end
 
+  def dup_piece(duped_board)
+    Piece.new(self.pos.dup, duped_board, color)
+  end
+
   def valid_moves
 
   end
 
   def move_into_chec?(end_pos)
-
+    board.dup
+    board.
   end
 
   def valid_move?(pos)
