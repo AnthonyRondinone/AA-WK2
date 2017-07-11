@@ -1,5 +1,6 @@
 require 'colorize'
 require_relative 'cursor'
+require_relative 'board'
 
 
 class Display
@@ -13,12 +14,27 @@ class Display
     board.grid.each_with_index do |row, i|
       row.each_with_index do |piece, j|
         if cursor.cursor_pos == [i, j]
-          print " #{piece}".red
+          print " #{piece}".colorize(piece.color).colorize(:background => :red)
         else
-          print " #{piece}"
+          print " #{piece}".colorize(piece.color)
         end
       end
       puts "\n"
     end
   end
+
+  def run
+    while true
+      render
+      cursor.get_input
+      system("clear")
+    end
+  end
+
+end
+
+if __FILE__ == $PROGRAM_NAME
+  board = Board.create_board
+  display = Display.new(board)
+  display.run
 end
