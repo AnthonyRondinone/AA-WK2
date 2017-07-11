@@ -16,7 +16,7 @@ class Display
         if cursor.cursor_pos == [i, j]
           print " #{piece}".colorize(piece.color).colorize(:background => :red)
         else
-          print " #{piece}".colorize(piece.color)
+          print " #{piece}".colorize(piece.color).colorize(:background => :light_black)
         end
       end
       puts "\n"
@@ -36,5 +36,9 @@ end
 if __FILE__ == $PROGRAM_NAME
   board = Board.create_board
   display = Display.new(board)
-  display.run
+  # display.run
+
+  p board[[1,1]].moves
+  board.move_piece([1,1], [2,1])
+  p board[[2,1]].moves
 end

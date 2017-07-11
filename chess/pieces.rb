@@ -1,3 +1,5 @@
+require 'byebug'
+require 'singleton'
 module SteppingPiece
 
   def moves
@@ -8,14 +10,19 @@ end
 
 module SlidingPiece
 
-  def moves 
-    queue = [pos]
+  def moves
+    new_moves = []
 
-    until queue.empty?
-      next_move = queue.shift
-      new_moves =
+    move_dirs.each do |move|
+      next_pos = [move[0] + pos[0], move[1] + pos[1]]
+      while valid_move?(next_pos)
+        new_moves << next_pos
+        break unless board[next_pos].is_a? NullPiece
+        next_pos = [move[0] + next_pos[0], move[1] + next_pos[1]]
+      end
     end
 
+    new_moves
   end
 end
 
@@ -33,12 +40,10 @@ class Piece
     "X"
   end
 
-  # def value
-  #   "X"
-  # end
 
   def valid_move?(pos)
     return false unless (0..7).include?(pos.first) && (0..7).include?(pos.last)
+    # debugger
     return false if board[pos].color == self.color
     true
   end
@@ -47,12 +52,14 @@ class Piece
 end
 
 class NullPiece < Piece
-  def initialize(pos, board, color = :white)
-    super
+  include Singleton
+
+  def initialize
+    @color = :white
   end
 
   def to_s
-    "_"
+    " "
   end
 end
 
@@ -66,7 +73,7 @@ class Knight < Piece
                  [-2,1], [-2,-1]
                ]
   def to_s
-    "k"
+    "♞"
   end
 
   def move_dirs
@@ -84,7 +91,7 @@ class King < Piece
                ]
 
   def to_s
-    "K"
+    "♚"
   end
 
   def move_dirs
@@ -102,7 +109,7 @@ class Queen < Piece
                ]
 
   def to_s
-    "Q"
+    "♛"
   end
 
   def move_dirs
@@ -119,7 +126,7 @@ class Rook < Piece
                ]
 
   def to_s
-    "R"
+    "♜"
   end
 
   def move_dirs
@@ -131,14 +138,77 @@ class Bishop < Piece
   include SlidingPiece
 
   BISHOP_MOVES = [
-                 [1,1], [-1,-1]
+                 [1,1], [-1,-1],
+                 [1,-1], [-1,1]
                ]
 
   def to_s
-    "B"
+    "♝"
   end
 
   def move_dirs
     return BISHOP_MOVES
   end
+end
+
+class Pawn < Piece
+  # include SteppingPiece
+  attr_reader :start_pos
+  PAWN_MOVES = [
+                 [1,0], [-1,0]
+               ]
+  PAWN_START_MOVES = [
+                 [1,0], [-1,0],
+                 [2,0], [-2,0]
+               ]
+  PAWN_DIAG  = [
+    [1,1], [-1,-1],
+    [1,-1], [-1,1]
+              ]
+  def initialize(pos, board, color)
+    @pos = pos
+    @color = color
+    @board = board
+    @start_pos = pos
+  end
+
+  def to_s
+    "♟"
+  end
+
+  def moves
+    new_moves = []
+    # debugger
+    vertical_dirs = correct_directions(self.vertical_dirs)
+    new_moves = vertical_dirs.map  { |move| [move[0] + pos[0], move[1] + pos[1]] }
+    new_moves.select {|move| valid_move?(move) }
+
+    diag_dirs = correct_directions(PAWN_DIAG)
+    diag_dirs.each do |move|
+      new_pos = [move[0] + pos[0], move[1] + pos[1]]
+      if !board[new_pos].is_a?(NullPiece) && board[new_pos].color != self.color
+        new_moves << new_pos
+      end
+    end
+
+    new_moves
+  end
+
+  def vertical_dirs
+    if self.pos == start_pos
+      PAWN_START_MOVES
+    else
+      PAWN_MOVES
+    end
+  end
+
+  def correct_directions(dirs)
+    case self.start_pos.first
+    when 1
+      dirs.select {|move| move.first > 0 }
+    when 6
+      dirs.select {|move| move.first < 0 }
+    end
+  end
+
 end

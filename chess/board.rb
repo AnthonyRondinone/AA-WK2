@@ -28,7 +28,7 @@ class Board
   def populate_board
     [2,3,4,5].each do |row|
       [*0..7].each do |col|
-        grid[row][col] = NullPiece.new([row, col], self)
+        grid[row][col] = NullPiece.instance
       end
     end
     [0,1].each do |row|
@@ -41,7 +41,7 @@ class Board
         grid[row][col] = Piece.new([row, col], self, :blue)
       end
     end
-    # grid[0][0] = King.new([0,0], self)
+    grid[1][1] = Pawn.new([1,1], self, :green)
   end
 
   def move_piece(start_pos, end_pos)
@@ -54,7 +54,8 @@ class Board
     end
 
     self[end_pos] = self[start_pos]
-    self[start_pos] = NullPiece.new(start_pos, self)
+    # update the pieces position to the new position
+    self[start_pos] = NullPiece.instance
   end
 
   def valid_pos?(pos)
