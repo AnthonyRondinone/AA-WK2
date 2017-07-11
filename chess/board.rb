@@ -31,17 +31,33 @@ class Board
         grid[row][col] = NullPiece.instance
       end
     end
-    [0,1].each do |row|
+    # #Pawns
       [*0..7].each do |col|
-        grid[row][col] = Piece.new([row, col], self, :green)
+        grid[1][col] = Pawn.new([1, col], self, :green)
+        grid[6][col] = Pawn.new([6, col], self, :blue)
       end
-    end
-    [6,7].each do |row|
-      [*0..7].each do |col|
-        grid[row][col] = Piece.new([row, col], self, :blue)
+
+      [[0, :green] , [7, :blue]].each do |row, color|
+        grid[row][0] = Rook.new([row, 0], self, color)
+        grid[row][7] = Rook.new([row, 7], self, color)
+
+        grid[row][1] = Knight.new([row, 1], self, color)
+        grid[row][6] = Knight.new([row, 6], self, color)
+
+        grid[row][1] = Knight.new([row, 1], self, color)
+        grid[row][6] = Knight.new([row, 6], self, color)
+
+        grid[row][2] = Bishop.new([row, 2], self, color)
+        grid[row][5] = Bishop.new([row, 5], self, color)
       end
-    end
-    grid[1][1] = Pawn.new([1,1], self, :green)
+
+      grid[0][3] = Queen.new([0, 3], self, :green)
+      grid[0][4] = King.new([0, 4], self, :green)
+
+      grid[7][4] = Queen.new([7,4], self, :blue)
+      grid[7][3] = King.new([7,3], self, :blue)
+
+
   end
 
   def move_piece(start_pos, end_pos)
@@ -53,6 +69,7 @@ class Board
       raise "Cannot move piece here"
     end
 
+    self[start_pos].pos = end_pos
     self[end_pos] = self[start_pos]
     # update the pieces position to the new position
     self[start_pos] = NullPiece.instance
@@ -70,6 +87,36 @@ class Board
   def []=(pos, val)
     row,col = pos
     grid[row][col] = val
+  end
+
+  def in_check?(color)
+    king = all_pieces.select { |piece| piece.color == color && piece.is_a?(King) }
+    opponent_pieces = all_pieces.select { |piece| piece.color != color }
+
+    opponent_pieces.any? do |piece|
+      piece.moves.any? { |move| move == king.first.pos }
+    end
+  end
+
+  def dup
+
+  end
+
+  def all_pieces
+    all_pieces = []
+    [*0..7].each do |row|
+      [*0..7].each do |col|
+        all_pieces << self[[row, col]] unless self[[row,col]].is_a?(NullPiece)
+      end
+    end
+    all_pieces
+  end
+
+  def checkmate(color)
+    if in_check?(color)
+      player_pieces = all_pieces.select { |piece| piece.color == color }
+      player_pieces.all? { |piece| piece.valid_moves.empty? }
+    end
   end
 
 end

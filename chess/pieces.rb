@@ -27,7 +27,8 @@ module SlidingPiece
 end
 
 class Piece
-  attr_reader :board, :pos, :color
+  attr_reader :board, :color
+  attr_accessor :pos
 
   def initialize(pos, board, color)
     @board = board
@@ -40,6 +41,13 @@ class Piece
     "X"
   end
 
+  def valid_moves
+
+  end
+
+  def move_into_chec?(end_pos)
+
+  end
 
   def valid_move?(pos)
     return false unless (0..7).include?(pos.first) && (0..7).include?(pos.last)
@@ -180,12 +188,17 @@ class Pawn < Piece
     new_moves = []
     # debugger
     vertical_dirs = correct_directions(self.vertical_dirs)
-    new_moves = vertical_dirs.map  { |move| [move[0] + pos[0], move[1] + pos[1]] }
+    vertical_dirs.each do |move|
+      next_pos = [move[0] + pos[0], move[1] + pos[1]]
+      new_moves << next_pos
+      break unless board[next_pos].is_a? NullPiece
+    end
     new_moves.select {|move| valid_move?(move) }
 
     diag_dirs = correct_directions(PAWN_DIAG)
     diag_dirs.each do |move|
       new_pos = [move[0] + pos[0], move[1] + pos[1]]
+      next unless valid_move?(new_pos)
       if !board[new_pos].is_a?(NullPiece) && board[new_pos].color != self.color
         new_moves << new_pos
       end
