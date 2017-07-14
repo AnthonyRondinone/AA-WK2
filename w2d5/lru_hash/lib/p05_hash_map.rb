@@ -10,12 +10,19 @@ class HashMap
   end
 
   def include?(key)
+
+
   end
 
   def set(key, val)
+
   end
 
   def get(key)
+
+    i = key.hash % num_buckets
+    @store[i]
+
   end
 
   def delete(key)
