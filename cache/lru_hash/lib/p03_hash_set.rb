@@ -9,13 +9,6 @@ class HashSet
   end
 
   def insert(key)
-    # case key.class
-    # when Fixnum
-    #
-    # when Array
-    # when String
-    # when Hash
-    # end
     unless include?(key)
       resize! if num_buckets <= @count
       self[key] << key

@@ -9,16 +9,6 @@ class Array
     (el.hash + i.hash) ^ intermediate_hash
   end
 
-
-
-
-    # running_hash = []
-    # self.each_with_index do |el, idx|
-    #   running_hash << self[idx].hash + idx.hash
-    # end
-    # running_hash.inject do |hashed, el|
-    #   hashed = hashed ^ el
-    # end
   end
 end
 
@@ -29,8 +19,7 @@ class String
 end
 
 class Hash
-  # This returns 0 because rspec will break if it returns nil
-  # Make sure to implement an actual Hash#hash method
+
   def hash
     to_a.sort_by(&:hash).hash
   end

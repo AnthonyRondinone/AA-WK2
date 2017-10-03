@@ -41,28 +41,23 @@ class IntSet
   end
 
   def insert(num)
-    i = num % num_buckets
-    @store[i] << num
+    return false if include?(num)
+    self[num] << num
+    num
   end
 
   def remove(num)
-    @store.each do |bucket|
-      bucket.delete(num)
-    end
-
+    self[num].delete(num)
   end
 
   def include?(num)
-    @store.each do |bucket|
-      return true if bucket.include?(num)
-    end
-    false
+    self[num].include?(num)
   end
 
   private
 
   def [](num)
-    # optional but useful; return the bucket corresponding to `num`
+    @store[num % num_buckets]
   end
 
   def num_buckets
@@ -79,46 +74,41 @@ class ResizingIntSet
   end
 
   def insert(num)
-    unless include?(num)
-      resize! if num_buckets <= @count
-      i = num % num_buckets
-      @store[i] << num
-      @count += 1
-    end
+    return false if include?(num)
+    self[num] << num
+    @count += 1
+    resize! if num_buckets < @count
+
+    num
   end
 
   def remove(num)
-    i = num % num_buckets
     if include?(num)
-      @store[i].delete(num)
+      @store[num].delete(num)
       @count -= 1
     end
   end
 
   def include?(num)
-    @store.each do |bucket|
-      return true if bucket.include?(num)
-    end
-    false
+    self[num].include?(num)
   end
 
   private
-
-  def [](num)
-    # optional but useful; return the bucket corresponding to `num`
-  end
 
   def num_buckets
     @store.length
   end
 
   def resize!
-    # debugger
+    old_store = @store
     @count = 0
-    old_store = @store.dup
     @store = Array.new(num_buckets * 2) { Array.new }
-    old_store.each do |bucket|
-      bucket.each { |el| insert(el)}
-    end
+
+    old_store.flatten.each { |num| insert(num) }
   end
+
+  def [](num)
+    @store[num % num_buckets]
+  end
+
 end
