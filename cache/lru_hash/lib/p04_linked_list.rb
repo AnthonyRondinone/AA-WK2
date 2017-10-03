@@ -1,4 +1,3 @@
-require 'byebug'
 
 class Link
   attr_accessor :key, :val, :next, :prev
@@ -51,35 +50,17 @@ class LinkedList
   end
 
   def get(key)
-
-    current_link = self.first
-
-    until current_link == @tail
-      if current_link.key == key
-        return current_link.val
-      end
-      current_link = current_link.next
-    end
-
+    self.each { |link| return link.val if link.key == key}
     nil
-
   end
 
   def include?(key)
-
-    current_link = self.first
-
-    until current_link == @tail
-      return true if current_link.key == key
-      current_link = current_link.next
-    end
-    false
-
-
+    any? { |link| link.key == key}
   end
 
   def append(key, val)
     new_link = Link.new(key, val)
+
     new_link.next = @tail
     new_link.prev = @tail.prev
     new_link.prev.next = new_link
@@ -123,7 +104,6 @@ class LinkedList
       current_link = current_link.next
     end
     self
-
   end
 
 
