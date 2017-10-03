@@ -37,5 +37,11 @@ class HashSet
   end
 
   def resize!
+    old_store = @store
+    @count = 0
+
+    @store = Array.new(num_buckets * 2) {Array.new}
+
+    old_store.flatten.each {|num| insert(num) }
   end
 end
