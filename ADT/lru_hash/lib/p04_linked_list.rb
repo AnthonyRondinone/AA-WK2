@@ -25,14 +25,14 @@ class LinkedList
 
   include Enumerable
 
-  def initialize
+  def initialize # lru
     @head = Link.new
     @tail = Link.new
     @head.next = @tail
     @tail.prev = @head
   end
 
-  def [](i)
+  def [](i) # lru
     each_with_index { |link, j| return link if i == j }
     nil
   end
@@ -58,7 +58,7 @@ class LinkedList
     any? { |link| link.key == key}
   end
 
-  def append(key, val)
+  def append(key, val)  # lru
     new_link = Link.new(key, val)
 
     new_link.next = @tail
@@ -82,7 +82,7 @@ class LinkedList
 
   end
 
-  def remove(key)
+  def remove(key) # lru
 
     current_link = self.first
 
